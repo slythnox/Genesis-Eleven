@@ -8,12 +8,16 @@ commands:
   - "rm -rf /*"
   - "rm -rf ~"
   - "rm -rf $HOME"
+  - "del /q /s C:\\"
+  - "del /q /s %USERPROFILE%"
+  - "rmdir /s /q C:\\"
   - "dd if=/dev/zero"
   - "mkfs"
   - "fdisk"
   - "parted"
   - "format"
-  - "del /q /s"
+  - "format C:"
+  - "format D:"
   
   # Don't mess with system stuff
   - "sudo rm"
@@ -23,6 +27,10 @@ commands:
   - "systemctl stop"
   - "systemctl disable"
   - "service stop"
+  - "net stop"
+  - "sc stop"
+  - "reg delete HKLM"
+  - "reg delete HKCU"
   
   # Don't download and run random stuff
   - "curl | bash"
@@ -30,26 +38,35 @@ commands:
   - "curl | sh"
   - "bash <(curl"
   - "bash <(wget"
+  - "powershell -c \"iex"
+  - "powershell iex"
   
   # Don't kill everything
   - "kill -9 -1"
   - "killall -9"
   - "pkill -f"
+  - "taskkill /f /im *"
+  - "wmic process"
 
 # Patterns that are usually bad news
 patterns:
   - "rm\\s+-rf\\s+/"
+  - "del\\s+/[qsf]\\s+C:\\\\"
+  - "rmdir\\s+/s\\s+/q\\s+C:\\\\"
   - "chmod\\s+777\\s+"
   - "\\|\\s*bash"
   - "\\|\\s*sh"
+  - "\\|\\s*powershell"
   - ">/dev/sd[a-z]"
   - "format\\s+[A-Z]:"
   - "del\\s+/[qsf]"
   - "truncate\\s+-s\\s*0"
   - "shred\\s+"
   - "> /dev/null"
+  - "> nul"
   - ":(){ :|:& };:"
   - "while true; do"
+  - "while\\s*\\(\\s*\\$true\\s*\\)"
 
 # High-risk operations that require explicit confirmation
 highRisk:
@@ -66,8 +83,14 @@ highRisk:
   - "yum remove"
   - "osascript -e"
   - "powershell.exe"
+  - "powershell -Command"
+  - "powershell -c"
   - "reg delete"
+  - "reg add HKLM"
   - "dconf reset"
+  - "netsh"
+  - "bcdedit"
+  - "diskpart"
 
 # Commands that require package manager confirmation
 packageManagers:
@@ -78,6 +101,9 @@ packageManagers:
   - "yum install"
   - "dnf install"
   - "pacman -S"
+  - "choco install"
+  - "winget install"
+  - "scoop install"
 
 # Desktop control specific patterns
 desktopControl:
@@ -93,6 +119,17 @@ desktopControl:
     - "amixer"
     - "gsettings"
     - "defaults write"
+    - "explorer"
+    - "notepad"
+    - "calc"
+    - "mspaint"
+    - "tasklist"
+    - "dir"
+    - "type"
+    - "copy"
+    - "move"
+    - "mkdir"
+    - "echo"
     
   # Medium risk desktop operations
   mediumRisk:
@@ -102,6 +139,10 @@ desktopControl:
     - "launchctl"
     - "reg add"
     - "dconf write"
+    - "taskkill"
+    - "net user"
+    - "schtasks"
+    - "wmic"
     
   # High risk desktop operations  
   highRisk:
@@ -110,3 +151,8 @@ desktopControl:
     - "reg delete"
     - "dconf reset"
     - "defaults delete"
+    - "taskkill /f"
+    - "net stop"
+    - "sc delete"
+    - "bcdedit"
+    - "diskpart"

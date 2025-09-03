@@ -4,6 +4,7 @@ import path from 'path';
 import os from 'os';
 import { ConfigManager } from '../utils/ConfigManager.js';
 import { LoggingUtil } from '../utils/LoggingUtil.js';
+import { PlatformUtils } from '../utils/PlatformUtils.js';
 import { ExecutionResult } from '../models/ExecutionResult.js';
 import { SandboxException } from '../exceptions/SandboxException.js';
 
@@ -46,7 +47,10 @@ export class SandboxExecutor {
       // Validate working directory
       await this._validateWorkingDirectory(workingDir);
 
-      const result = await this._runCommand(step.command, workingDir);
+      // Normalize command for current platform
+      const normalizedCommand = PlatformUtils.normalizeCommand(step.command);
+
+      const result = await this._runCommand(normalizedCommand, workingDir);
       const duration = Date.now() - startTime;
 
       const executionResult = new ExecutionResult({
@@ -153,30 +157,58 @@ export class SandboxExecutor {
       return null;
     }
 
-    // Simple but safe command parsing
-    const parts = trimmed.split(/\s+/);
-    const cmd = parts[0];
-    const args = parts.slice(1);
+    // Cross-platform command parsing
+    let cmd, args;
+    
+    if (process.platform === 'win32') {
+      // Windows command handling
+      if (trimmed.startsWith('cmd /c ') || trimmed.startsWith('powershell ')) {
+        const parts = trimmed.split(/\s+/);
+        cmd = parts[0];
+        args = parts.slice(1);
+      } else {
+        // Wrap in cmd /c for Windows compatibility
+        cmd = 'cmd';
+        args = ['/c', trimmed];
+      }
+    } else {
+      // Unix-like systems (Linux, macOS)
+      const parts = trimmed.split(/\s+/);
+      cmd = parts[0];
+      args = parts.slice(1);
+    }
 
     return { cmd, args };
   }
 
   _getSandboxEnvironment() {
-    const safeEnv = {
-      PATH: process.env.PATH,
-      HOME: this.workDir,
-      TMPDIR: path.join(this.workDir, 'tmp'),
-      USER: 'genesis-eleven-user',
-      SHELL: process.env.SHELL || '/bin/bash',
-      LANG: process.env.LANG || 'en_US.UTF-8',
-      NODE_ENV: 'sandbox'
-    };
-
-    // Add platform-specific variables
+    let safeEnv;
+    
     if (process.platform === 'win32') {
-      safeEnv.USERPROFILE = this.workDir;
-      safeEnv.TEMP = path.join(this.workDir, 'tmp');
-      safeEnv.TMP = path.join(this.workDir, 'tmp');
+      // Windows environment
+      safeEnv = {
+        PATH: process.env.PATH,
+        USERPROFILE: this.workDir,
+        TEMP: path.join(this.workDir, 'tmp'),
+        TMP: path.join(this.workDir, 'tmp'),
+        APPDATA: path.join(this.workDir, 'AppData'),
+        LOCALAPPDATA: path.join(this.workDir, 'AppData', 'Local'),
+        USERNAME: 'genesis-eleven-user',
+        COMPUTERNAME: 'GENESIS-ELEVEN',
+        NODE_ENV: 'sandbox',
+        COMSPEC: process.env.COMSPEC || 'cmd.exe'
+      };
+    } else {
+      // Unix-like systems (Linux, macOS)
+      safeEnv = {
+        PATH: process.env.PATH,
+        HOME: this.workDir,
+        TMPDIR: path.join(this.workDir, 'tmp'),
+        USER: 'genesis-eleven-user',
+        SHELL: process.env.SHELL || '/bin/bash',
+        LANG: process.env.LANG || 'en_US.UTF-8',
+        NODE_ENV: 'sandbox'
+      };
     }
 
     return safeEnv;
@@ -186,20 +218,39 @@ export class SandboxExecutor {
     // Create necessary subdirectories
     const dirs = ['tmp', 'logs', 'workspace', 'backup'];
     
+    // Add Windows-specific directories
+    if (process.platform === 'win32') {
+      dirs.push('AppData', path.join('AppData', 'Local'), path.join('AppData', 'Roaming'));
+    }
+    
     for (const dir of dirs) {
       await fs.mkdir(path.join(this.workDir, dir), { recursive: true });
     }
 
-    // Create basic configuration files
-    const bashrc = path.join(this.workDir, '.bashrc');
-    if (!(await this._fileExists(bashrc))) {
-      const bashrcContent = `# Genesis Eleven CLI Sandbox Environment
+    // Create platform-specific configuration files
+    if (process.platform === 'win32') {
+      // Windows batch file for environment setup
+      const batchFile = path.join(this.workDir, 'setup.bat');
+      if (!(await this._fileExists(batchFile))) {
+        const batchContent = `@echo off
+REM Genesis Eleven CLI Sandbox Environment
+set GENESIS_ELEVEN_SANDBOX=1
+set PROMPT=genesis-eleven$G 
+`;
+        await fs.writeFile(batchFile, batchContent);
+      }
+    } else {
+      // Unix shell configuration
+      const bashrc = path.join(this.workDir, '.bashrc');
+      if (!(await this._fileExists(bashrc))) {
+        const bashrcContent = `# Genesis Eleven CLI Sandbox Environment
 export PS1="genesis-eleven$ "
 export GENESIS_ELEVEN_SANDBOX=1
 alias ll='ls -la'
 alias la='ls -A'
 `;
-      await fs.writeFile(bashrc, bashrcContent);
+        await fs.writeFile(bashrc, bashrcContent);
+      }
     }
   }
 

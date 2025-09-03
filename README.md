@@ -6,6 +6,7 @@
 
 - 🧠 **Talk to Your Computer** - Use normal language instead of memorizing commands
 - 🖥️ **Control Everything** - Files, apps, settings, you name it
+- 🌍 **Works Everywhere** - Full support for Windows, macOS, and Linux
 - 🛡️ **Stay Safe** - Won't let you accidentally break anything
 - 📋 **See Before You Do** - Shows you what it plans to do first
 - ⚡ **Handle Complex Stuff** - Can do multiple things in sequence
@@ -33,6 +34,14 @@ el config
 # Test installation
 el ask "Hello, are you working?"
 ```
+
+### System Requirements
+
+- **Node.js 18+** - Required for all platforms
+- **Windows 10/11** - Full support with cmd.exe and PowerShell
+- **macOS 10.15+** - Native Unix command support
+- **Linux** - Any modern distribution with bash/zsh
+- **Internet Connection** - Required for Gemini AI API
 
 ### Getting Your API Key
 
@@ -64,6 +73,22 @@ el "set brightness to 50%"
 el "increase volume by 20%"
 el "enable dark mode"
 el "connect to my home WiFi network"
+
+# Platform-specific examples
+# Windows
+el "open Control Panel and show installed programs"
+el "check Windows Update status"
+el "open Task Manager"
+
+# macOS  
+el "open System Preferences and show display settings"
+el "show all running applications in Activity Monitor"
+el "enable Night Shift mode"
+
+# Linux
+el "open file manager and navigate to home directory"
+el "show system information using neofetch"
+el "update package repositories"
 ```
 
 ### Automation Workflows

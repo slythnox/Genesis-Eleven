@@ -1,6 +1,7 @@
 import { GeminiClient } from '../api/GeminiClient.js';
 import { ConfigManager } from '../utils/ConfigManager.js';
 import { LoggingUtil } from '../utils/LoggingUtil.js';
+import { PlatformUtils } from '../utils/PlatformUtils.js';
 import { Plan } from '../models/Plan.js';
 import { ApiException } from '../exceptions/ApiException.js';
 
@@ -30,6 +31,13 @@ Respond with valid JSON only.`;
       );
 
       const planData = this._parseAndValidatePlan(response);
+      
+      // Normalize commands for current platform
+      planData.steps = planData.steps.map(step => ({
+        ...step,
+        command: PlatformUtils.normalizeCommand(step.command)
+      }));
+      
       const plan = new Plan(planData);
       
       this.logger.info('Plan created successfully', { 
@@ -59,7 +67,16 @@ Rules:
 - Focus on desktop stuff: files, apps, settings
 - Don't do anything destructive without asking
 - Use commands that actually exist
-- Think about different operating systems
+- Adapt commands for the user's operating system (Windows, macOS, Linux)
+
+Platform-specific command guidelines:
+- Windows: Use 'dir' instead of 'ls', 'type' instead of 'cat', 'del' instead of 'rm'
+- macOS: Use 'open' to launch applications, 'osascript' for system control
+- Linux: Use standard Unix commands, 'xdg-open' for file opening
+
+Current platform: ${process.platform}
+
+Always generate commands appropriate for the current platform.
 
 JSON format:
 {
