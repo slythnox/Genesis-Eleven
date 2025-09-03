@@ -1,0 +1,112 @@
+# Commands we definitely don't want to run
+# These could seriously mess up someone's computer
+
+# Really bad commands
+commands:
+  # Don't delete everything
+  - "rm -rf /"
+  - "rm -rf /*"
+  - "rm -rf ~"
+  - "rm -rf $HOME"
+  - "dd if=/dev/zero"
+  - "mkfs"
+  - "fdisk"
+  - "parted"
+  - "format"
+  - "del /q /s"
+  
+  # Don't mess with system stuff
+  - "sudo rm"
+  - "su -"
+  - "chmod 777"
+  - "chown root"
+  - "systemctl stop"
+  - "systemctl disable"
+  - "service stop"
+  
+  # Don't download and run random stuff
+  - "curl | bash"
+  - "wget | sh"
+  - "curl | sh"
+  - "bash <(curl"
+  - "bash <(wget"
+  
+  # Don't kill everything
+  - "kill -9 -1"
+  - "killall -9"
+  - "pkill -f"
+
+# Patterns that are usually bad news
+patterns:
+  - "rm\\s+-rf\\s+/"
+  - "chmod\\s+777\\s+"
+  - "\\|\\s*bash"
+  - "\\|\\s*sh"
+  - ">/dev/sd[a-z]"
+  - "format\\s+[A-Z]:"
+  - "del\\s+/[qsf]"
+  - "truncate\\s+-s\\s*0"
+  - "shred\\s+"
+  - "> /dev/null"
+  - ":(){ :|:& };:"
+  - "while true; do"
+
+# High-risk operations that require explicit confirmation
+highRisk:
+  - "git reset --hard"
+  - "git clean -fd"
+  - "docker system prune"
+  - "npm ci"
+  - "mvn clean"
+  - "gradle clean"
+  - "pip uninstall"
+  - "npm uninstall -g"
+  - "brew uninstall"
+  - "apt-get remove"
+  - "yum remove"
+  - "osascript -e"
+  - "powershell.exe"
+  - "reg delete"
+  - "dconf reset"
+
+# Commands that require package manager confirmation
+packageManagers:
+  - "npm install"
+  - "pip install"
+  - "brew install"
+  - "apt-get install"
+  - "yum install"
+  - "dnf install"
+  - "pacman -S"
+
+# Desktop control specific patterns
+desktopControl:
+  # Safe desktop operations
+  safe:
+    - "open"
+    - "start"
+    - "xdg-open"
+    - "osascript"
+    - "wmctrl"
+    - "xrandr"
+    - "pactl"
+    - "amixer"
+    - "gsettings"
+    - "defaults write"
+    
+  # Medium risk desktop operations
+  mediumRisk:
+    - "killall"
+    - "pkill"
+    - "systemctl"
+    - "launchctl"
+    - "reg add"
+    - "dconf write"
+    
+  # High risk desktop operations  
+  highRisk:
+    - "sudo killall"
+    - "sudo systemctl"
+    - "reg delete"
+    - "dconf reset"
+    - "defaults delete"
