@@ -15,7 +15,7 @@
 - 🎯 **Smart About Risk** - Knows what's dangerous and what's not
 - 🔧 **Runs Safely** - Everything happens in a protected environment
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
