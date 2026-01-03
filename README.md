@@ -1,4 +1,4 @@
-# 🌟 Genesis Eleven CLI - AI-Powered Desktop Control
+# Genesis Eleven CLI - AI-Powered Desktop Control
 
 **Genesis Eleven CLI** is a smart command-line tool that lets you control your computer using plain English. Tell it what you want to do, and it figures out the commands to make it happen. Want to organize your files? Just say so. Need to open an app? Ask away. It's like having a conversation with your computer.
 
@@ -45,8 +45,8 @@ el ask "Hello, are you working?"
 
 ### Getting Your API Key
 
-1. Visit [Google AI Studio](https://makersuite.google.com/app/apikey)
-2. Click "Create API key"
+1. Visit [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Click "Create API key" or "Get API key"
 3. Copy the generated key
 4. Run `el config` and follow the prompts
 
