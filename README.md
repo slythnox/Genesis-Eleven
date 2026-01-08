@@ -448,7 +448,7 @@ el config --test
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **Google Gemini AI** - Providing advanced AI capabilities
 - **Node.js Community** - Excellent tooling and ecosystem
